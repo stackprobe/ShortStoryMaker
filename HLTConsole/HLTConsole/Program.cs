@@ -167,7 +167,7 @@ namespace HLTStudio
 			string[] workMaterialFiles = selectedMaterialFiles
 				.Select(file => Path.Combine(Consts.WORK_DIR, Path.GetFileName(file)))
 				.ToArray();
-			string outputFile = Path.Combine(Consts.WORK_DIR, "Output.txt");
+			string outputFile = Path.Combine(Consts.WORK_DIR, "Output.md");
 
 			File.Copy(selectedPlotFile, workPlotFile);
 
@@ -189,7 +189,7 @@ namespace HLTStudio
 			if (!File.Exists(outputFile))
 				throw new Exception("出力ファイルが作成されませんでした。");
 
-			File.Move(outputFile, Path.Combine(Consts.STORY_STORAGE_DIR, SCommon.GetULID() + ".txt"));
+			File.Move(outputFile, Path.Combine(Consts.STORY_STORAGE_DIR, SCommon.GetULID() + ".md"));
 
 			SCommon.DeletePath(selectedPlotFile);
 
