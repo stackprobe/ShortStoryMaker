@@ -62,6 +62,28 @@ namespace HLTStudio
 
 		private void Main5(ArgsReader ar)
 		{
+			SCommon.CreateDir(Consts.PLOT_STORAGE_DIR);
+			SCommon.CreateDir(Consts.MATERIAL_STORAGE_DIR);
+			SCommon.CreateDir(Consts.STORY_STORAGE_DIR);
+
+			string[] plotFiles = Directory.GetFiles(Consts.PLOT_STORAGE_DIR);
+			string[] materialFiles = Directory.GetFiles(Consts.MATERIAL_STORAGE_DIR);
+
+			if (
+				plotFiles.Length < 10 ||
+				materialFiles.Length < 10
+				)
+			{
+				素材補充();
+			}
+			else
+			{
+				執筆();
+			}
+		}
+
+		private void 素材補充()
+		{
 			SCommon.DeleteAndCreateDir(Consts.WORK_DIR);
 
 			string dekigotoFile = Path.Combine(Consts.WORK_DIR, "Dekigoto.md");
@@ -96,6 +118,83 @@ namespace HLTStudio
 
 				return prompt;
 			});
+
+			string[] materialFiles = Directory.GetFiles(materialDir, "*.md");
+
+			// -- 出力存在チェック --
+
+			if (materialFiles.Length < 1)
+				throw new Exception("マテリアルが出力されていません");
+
+			if (!File.Exists(plotFile_01))
+				throw new Exception("プロット(1)が出力されていません");
+
+			if (!File.Exists(plotFile_02))
+				throw new Exception("プロット(2)が出力されていません");
+
+			if (!File.Exists(plotFile_03))
+				throw new Exception("プロット(3)が出力されていません");
+
+			// --
+
+			foreach (string file in new string[] { plotFile_01, plotFile_02, plotFile_03 })
+				File.Move(file, Path.Combine(Consts.PLOT_STORAGE_DIR, SCommon.GetULID() + ".md"));
+
+			foreach (string file in materialFiles)
+				File.Move(file, Path.Combine(Consts.MATERIAL_STORAGE_DIR, SCommon.GetULID() + ".md"));
+		}
+
+		private void 執筆()
+		{
+			string[] plotFiles = Directory.GetFiles(Consts.PLOT_STORAGE_DIR);
+			string[] materialFiles = Directory.GetFiles(Consts.MATERIAL_STORAGE_DIR);
+
+			if (plotFiles.Length < 1)
+				throw new Exception("no plotFiles");
+
+			if (materialFiles.Length < 1)
+				throw new Exception("no materialFiles");
+
+			int materialCount = Math.Max(1, materialFiles.Length / plotFiles.Length);
+
+			string selectedPlotFile = SCommon.CRandom.ChooseOne(plotFiles);
+			SCommon.CRandom.Shuffle(materialFiles);
+			string[] selectedMaterialFiles = SCommon.GetPart(materialFiles, 0, materialCount);
+
+			SCommon.DeleteAndCreateDir(Consts.WORK_DIR);
+
+			string workPlotFile = Path.Combine(Consts.WORK_DIR, "Plot.md");
+			string[] workMaterialFiles = selectedMaterialFiles
+				.Select(file => Path.Combine(Consts.WORK_DIR, Path.GetFileName(file)))
+				.ToArray();
+			string outputFile = Path.Combine(Consts.WORK_DIR, "Output.txt");
+
+			File.Copy(selectedPlotFile, workPlotFile);
+
+			for (int i = 0; i < materialCount; i++)
+				File.Copy(selectedMaterialFiles[i], workMaterialFiles[i]);
+
+			CodexUtils.Run(PromptResource.PROMPT_03, prompt =>
+			{
+				prompt = SCommon.ReplaceAll(
+					prompt,
+					"{{INPUT_PLOT_FILE}}", workPlotFile,
+					"{{INPUT_MATERIAL_FILES}}", string.Join("\r\n", workMaterialFiles),
+					"{{OUTPUT_FILE}}", outputFile
+					);
+
+				return prompt;
+			});
+
+			if (!File.Exists(outputFile))
+				throw new Exception("出力ファイルが作成されませんでした。");
+
+			File.Move(outputFile, Path.Combine(Consts.STORY_STORAGE_DIR, SCommon.GetULID() + ".txt"));
+
+			SCommon.DeletePath(selectedPlotFile);
+
+			foreach (string file in selectedMaterialFiles)
+				SCommon.DeletePath(file);
 		}
 	}
 }
