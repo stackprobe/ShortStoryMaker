@@ -65,6 +65,7 @@ namespace HLTStudio
 			SCommon.CreateDir(Consts.PLOT_STORAGE_DIR);
 			SCommon.CreateDir(Consts.MATERIAL_STORAGE_DIR);
 			SCommon.CreateDir(Consts.STORY_STORAGE_DIR);
+			SCommon.CreateDir(Consts.ILLUST_STORAGE_DIR);
 
 			string[] plotFiles = Directory.GetFiles(Consts.PLOT_STORAGE_DIR);
 			string[] materialFiles = Directory.GetFiles(Consts.MATERIAL_STORAGE_DIR);
@@ -168,6 +169,7 @@ namespace HLTStudio
 				.Select(file => Path.Combine(Consts.WORK_DIR, Path.GetFileName(file)))
 				.ToArray();
 			string outputFile = Path.Combine(Consts.WORK_DIR, "Output.md");
+			string outputIllustFile = Path.Combine(Consts.WORK_DIR, "OutputIllust.png");
 
 			File.Copy(selectedPlotFile, workPlotFile);
 
@@ -189,7 +191,24 @@ namespace HLTStudio
 			if (!File.Exists(outputFile))
 				throw new Exception("出力ファイルが作成されませんでした。");
 
-			File.Move(outputFile, Path.Combine(Consts.STORY_STORAGE_DIR, SCommon.GetULID() + ".md"));
+			CodexUtils.Run(PromptResource.PROMPT_04, prompt =>
+			{
+				prompt = SCommon.ReplaceAll(
+					prompt,
+					"{{INPUT_STORY_FILE}}", outputFile,
+					"{{OUTPUT_IMAGE_FILE}}", outputIllustFile
+					);
+
+				return prompt;
+			});
+
+			if (!File.Exists(outputIllustFile))
+				throw new Exception("出力イラスト・ファイルが作成されませんでした。");
+
+			string storyId = SCommon.GetULID();
+
+			File.Move(outputFile, Path.Combine(Consts.STORY_STORAGE_DIR, storyId + ".md"));
+			File.Move(outputIllustFile, Path.Combine(Consts.ILLUST_STORAGE_DIR, storyId + ".png"));
 
 			SCommon.DeletePath(selectedPlotFile);
 

@@ -32,5 +32,10 @@ namespace HLTStudio
 		/// ストーリー置き場ディレクトリ
 		/// </summary>
 		public static string STORY_STORAGE_DIR => Path.Combine(STORAGE_DIR, "Story");
+
+		/// <summary>
+		/// イラスト置き場ディレクトリ
+		/// </summary>
+		public static string ILLUST_STORAGE_DIR => Path.Combine(STORAGE_DIR, "Illust");
 	}
 }
