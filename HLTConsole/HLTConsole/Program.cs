@@ -66,6 +66,8 @@ namespace HLTStudio
 			SCommon.CreateDir(Consts.MATERIAL_STORAGE_DIR);
 			SCommon.CreateDir(Consts.STORY_STORAGE_DIR);
 			SCommon.CreateDir(Consts.ILLUST_STORAGE_DIR);
+			SCommon.CreateDir(Consts.HTML_STORAGE_DIR);
+			SCommon.CreateDir(Consts.HTML_DATA_DIR);
 
 			string[] plotFiles = Directory.GetFiles(Consts.PLOT_STORAGE_DIR);
 			string[] materialFiles = Directory.GetFiles(Consts.MATERIAL_STORAGE_DIR);
@@ -81,6 +83,7 @@ namespace HLTStudio
 			{
 				執筆();
 			}
+			GeneratePage();
 		}
 
 		private void 素材補充()
@@ -210,10 +213,96 @@ namespace HLTStudio
 			File.Move(outputFile, Path.Combine(Consts.STORY_STORAGE_DIR, storyId + ".md"));
 			File.Move(outputIllustFile, Path.Combine(Consts.ILLUST_STORAGE_DIR, storyId + ".png"));
 
+			// -- 使用済み素材を削除 --
+
 			SCommon.DeletePath(selectedPlotFile);
 
 			foreach (string file in selectedMaterialFiles)
 				SCommon.DeletePath(file);
+
+			// --
+		}
+
+		private void GeneratePage()
+		{
+			string[] names1 = Directory.GetFiles(Consts.STORY_STORAGE_DIR)
+				.Select(file => Path.GetFileNameWithoutExtension(file))
+				.ToArray();
+			string[] names2 = Directory.GetFiles(Consts.HTML_DATA_DIR)
+				.Select(file => Path.GetFileNameWithoutExtension(file))
+				.ToArray();
+
+			var entries = SCommon.GetMerge(names1, names2, SCommon.CompIgnoreCase)[0];
+
+			if (entries.Count == 0)
+				return;
+
+			foreach (var entry in entries)
+			{
+				GeneratePage_Entry(entry);
+			}
+			GeneratePage_EntryList();
+		}
+
+		private void GeneratePage_Entry(string entry)
+		{
+			string storyFile = Path.Combine(Consts.STORY_STORAGE_DIR, entry + ".md");
+			string illustFile = Path.Combine(Consts.ILLUST_STORAGE_DIR, entry + ".png");
+			string htmlFile = Path.Combine(Consts.HTML_DATA_DIR, entry + ".html");
+
+			if (!File.Exists(storyFile))
+				throw null; // souteigai
+
+			if (!File.Exists(illustFile))
+				throw null; // souteigai
+
+			SCommon.DeleteAndCreateDir(Consts.WORK_DIR);
+
+			string workStoryFile = Path.Combine(Consts.WORK_DIR, "Story.md");
+			string illustUrl = $"../../Illust/{entry}.png";
+			string outputFile = Path.Combine(Consts.WORK_DIR, "Output.html");
+
+			File.Copy(storyFile, workStoryFile);
+
+			CodexUtils.Run(PromptResource.PROMPT_05, prompt =>
+			{
+				prompt = SCommon.ReplaceAll(
+					prompt,
+					"{{STORY_INPUT_FILE}}", workStoryFile,
+					"{{IMAGE_URL}}", illustUrl,
+					"{{OUTPUT_FILE}}", outputFile
+					);
+
+				return prompt;
+			});
+
+			if (!File.Exists(outputFile))
+				throw new Exception("出力ファイルが生成されませんでした！");
+
+			File.Move(outputFile, Path.Combine(Consts.HTML_DATA_DIR, entry + ".html"));
+		}
+
+		private void GeneratePage_EntryList()
+		{
+			string[] entries = Directory.GetFiles(Consts.HTML_DATA_DIR)
+				.Select(file => Path.GetFileNameWithoutExtension(file))
+				.OrderBy(SCommon.CompIgnoreCase)
+				.Reverse() // 逆順 -- 最新のストーリーを最初に
+				.ToArray();
+
+			string outputText = $@"
+
+const entryList = [
+{string.Join("\r\n", entries.Select(entry => $"\"{entry}\","))}
+];
+
+";
+
+			File.WriteAllText(
+				Path.Combine(Consts.HTML_STORAGE_DIR, "entry-list.js"),
+				outputText,
+				Encoding.UTF8
+				);
 		}
 	}
 }

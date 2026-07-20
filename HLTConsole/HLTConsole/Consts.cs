@@ -37,5 +37,15 @@ namespace HLTStudio
 		/// イラスト置き場ディレクトリ
 		/// </summary>
 		public static string ILLUST_STORAGE_DIR => Path.Combine(STORAGE_DIR, "Illust");
+
+		/// <summary>
+		/// HTML ディレクトリ
+		/// </summary>
+		public static string HTML_STORAGE_DIR => Path.Combine(STORAGE_DIR, "HTML");
+
+		/// <summary>
+		/// HTML-DATA ディレクトリ
+		/// </summary>
+		public static string HTML_DATA_DIR => Path.Combine(HTML_STORAGE_DIR, "Data");
 	}
 }
