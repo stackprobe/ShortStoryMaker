@@ -284,6 +284,9 @@ namespace HLTStudio
 
 		private void GeneratePage_EntryList()
 		{
+			// ====
+			// エントリー・リスト
+
 			string[] entries = Directory.GetFiles(Consts.HTML_DATA_DIR)
 				.Select(file => Path.GetFileNameWithoutExtension(file))
 				.OrderBy(SCommon.CompIgnoreCase)
@@ -300,6 +303,37 @@ const entryList = [
 
 			File.WriteAllText(
 				Path.Combine(Consts.HTML_STORAGE_DIR, "entry-list.js"),
+				outputText,
+				Encoding.UTF8
+				);
+
+			// ====
+			// タイトル・リスト
+
+			string[] titles = entries
+				.Select(entry =>
+				{
+					string file = Path.Combine(Consts.STORY_STORAGE_DIR, entry + ".md");
+					string[] lines = File.ReadAllLines(file, Encoding.UTF8)
+						.Select(line => line.Trim())
+						.Where(line => line != "")
+						.ToArray();
+
+					string title = lines[0];
+					return title;
+				})
+				.ToArray();
+
+			outputText = $@"
+
+const titleList = [
+{string.Join("\r\n", titles.Select(title => $"\"{title}\","))}
+];
+
+";
+
+			File.WriteAllText(
+				Path.Combine(Consts.HTML_STORAGE_DIR, "title-list.js"),
 				outputText,
 				Encoding.UTF8
 				);
