@@ -69,20 +69,22 @@ namespace HLTStudio
 			SCommon.CreateDir(Consts.HTML_STORAGE_DIR);
 			SCommon.CreateDir(Consts.HTML_DATA_DIR);
 
-			string[] plotFiles = Directory.GetFiles(Consts.PLOT_STORAGE_DIR);
-			string[] materialFiles = Directory.GetFiles(Consts.MATERIAL_STORAGE_DIR);
-
-			if (
-				plotFiles.Length < 10 ||
-				materialFiles.Length < 10
-				)
+			for (; ; )
 			{
+				string[] plotFiles = Directory.GetFiles(Consts.PLOT_STORAGE_DIR);
+				string[] materialFiles = Directory.GetFiles(Consts.MATERIAL_STORAGE_DIR);
+
+				if (
+					plotFiles.Length >= 10 &&
+					materialFiles.Length >= 10
+					)
+					break;
+
 				素材補充();
 			}
-			else
-			{
-				執筆();
-			}
+
+			執筆();
+
 			GeneratePage();
 		}
 
