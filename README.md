@@ -185,6 +185,10 @@ Storage
 
 GitHub のページ上でリンクを開いた場合、HTML として表示されず、ソースコードとして表示されます。実際の表示を確認する場合は、このリポジトリをチェックアウトしてから、ローカル環境で `_Storage/HTML/index.html` をブラウザで開いてください。
 
+同じサンプル成果物は、次の場所にも置いています。こちらはブラウザからそのまま HTML として表示できます。
+
+[ShortStoryMaker サンプル成果物](http://chocomintice.ccsp.mydns.jp/HPStore/HPChest/20260719%5fShortStoryMaker%5fStorage/HTML/)
+
 個別のストーリー成果物は `_Storage/HTML/Data` 配下にあります。
 
 - [消さなかった画面](_Storage/HTML/Data/01KY00V732PG7E4GY92RCS2Y21.html)
