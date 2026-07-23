@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>短編小説一覧</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+            background: #f4f1ea;
+            color: #2f2b26;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 48px 20px;
+            background:
+                radial-gradient(circle at top, rgba(255, 255, 255, 0.9), transparent 36rem),
+                #f4f1ea;
+        }
+
+        main {
+            width: min(100%, 760px);
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 500;
+            letter-spacing: 0.12em;
+        }
+
+        .lead {
+            margin: 0;
+            color: #6c645b;
+            font-size: 0.98rem;
+        }
+
+        #entry-list {
+            display: grid;
+            gap: 14px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #entry-list li {
+            margin: 0;
+        }
+
+        #entry-list a {
+            display: block;
+            padding: 18px 20px;
+            border: 1px solid #d7d0c5;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.72);
+            color: inherit;
+            font-size: 1.08rem;
+            line-height: 1.7;
+            text-decoration: none;
+            transition:
+                background-color 0.16s ease,
+                border-color 0.16s ease,
+                transform 0.16s ease;
+        }
+
+        #entry-list a:hover,
+        #entry-list a:focus-visible {
+            border-color: #a99f91;
+            background: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        #entry-list a:focus-visible {
+            outline: 2px solid #6f675d;
+            outline-offset: 3px;
+        }
+
+        .error {
+            padding: 16px;
+            border: 1px solid #b99;
+            border-radius: 8px;
+            background: #fff7f7;
+            color: #733;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 32px 14px;
+            }
+
+            #entry-list a {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <h1>短編小説一覧</h1>
+            <p class="lead">読みたい物語を選んでください。</p>
+        </header>
+
+        <ul id="entry-list"></ul>
+        <p id="error-message" class="error" hidden></p>
+    </main>
+
+    <script src="./entry-list.js"></script>
+    <script src="./title-list.js"></script>
+    <script>
+        (() => {
+            "use strict";
+
+            const listElement = document.getElementById("entry-list");
+            const errorElement = document.getElementById("error-message");
+
+            const showError = message => {
+                listElement.replaceChildren();
+                errorElement.textContent = message;
+                errorElement.hidden = false;
+            };
+
+            if (!Array.isArray(entryList) || !Array.isArray(titleList)) {
+                showError("一覧データを読み込めませんでした。");
+                return;
+            }
+
+            if (entryList.length !== titleList.length) {
+                showError("エントリー一覧とタイトル一覧の件数が一致していません。");
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            for (let index = 0; index < entryList.length; index++) {
+                const ulid = entryList[index];
+                const title = titleList[index];
+
+                if (typeof ulid !== "string" || typeof title !== "string") {
+                    showError("一覧データに不正な値があります。");
+                    return;
+                }
+
+                const item = document.createElement("li");
+                const link = document.createElement("a");
+
+                link.href = `./Data/${encodeURIComponent(ulid)}.html`;
+                link.textContent = title;
+
+                item.appendChild(link);
+                fragment.appendChild(item);
+            }
+
+            listElement.appendChild(fragment);
+        })();
+    </script>
+</body>
+</html>

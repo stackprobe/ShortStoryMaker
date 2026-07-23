@@ -1,4 +1,4 @@
-# ShortStoryMaker
+﻿# ShortStoryMaker
 
 ShortStoryMaker は、Codex CLI を使って短編小説を自動生成する実験プログラムです。
 
