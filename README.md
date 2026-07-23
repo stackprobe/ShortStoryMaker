@@ -55,6 +55,37 @@ codex -C "C:\temp\MyWork" exec ^
 
 この形にすると、Codex は指定された作業ディレクトリで `Prompt.md` を読み、その指示に従ってファイルを読み書きします。
 
+### このオプションになった経緯
+
+最初はもっと単純に、次のような形で実行していました。
+
+```bat
+codex -C "C:\temp\_SSM" exec "Prompt.md を読み、その内容を今回の作業指示として実行してください。"
+```
+
+しかし、`C:\temp\_SSM` は Git リポジトリではない一時作業フォルダだったため、Codex CLI から次のようなエラーが出ました。
+
+```text
+Not inside a trusted directory and --skip-git-repo-check was not specified.
+```
+
+Codex CLI は通常、信頼できる Git リポジトリ内での実行を前提としています。このプログラムでは、処理ごとに作り直す一時作業フォルダを使いたかったため、Git リポジトリ確認を省略する `--skip-git-repo-check` を追加しました。
+
+次に、Codex が `Prompt.md` を読んで調査や文章生成までは行えるものの、出力ファイルを保存しようとすると、実行環境が read-only のため書き込みを拒否されることがありました。
+
+この用途では、Codex に `Dekigoto.md`、`Output.md`、`Output.html` などの成果物ファイルを作らせる必要があります。そこで、作業ディレクトリ内への書き込みを許可する `--sandbox workspace-write` を追加しました。
+
+結果として、このプログラムでは次の指定を組み合わせています。
+
+- `-C "C:\temp\_SSM"`
+  - Codex の作業ディレクトリを指定する
+- `exec`
+  - Codex を非対話形式で実行し、処理が終わったら終了する
+- `--skip-git-repo-check`
+  - Git 管理していない一時フォルダでも実行できるようにする
+- `--sandbox workspace-write`
+  - 作業ディレクトリ内へのファイル作成・更新を許可する
+
 ### なぜ Prompt.md を使うのか
 
 短い指示ならコマンドラインへ直接書けますが、実際の作業指示はすぐ長くなります。
