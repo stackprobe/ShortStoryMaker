@@ -177,6 +177,23 @@ Storage
 
 ファイル名には ULID 形式の ID を使っています。小説本文、挿絵、HTML は同じ ID で対応します。
 
+## サンプル成果物
+
+生成済みの成果物サンプルを `_Storage` 配下に置いています。
+
+一覧ページは [_Storage/HTML/index.html](_Storage/HTML/index.html) です。ブラウザで開くと、生成された短編小説の一覧を確認できます。
+
+個別のストーリー成果物は `_Storage/HTML/Data` 配下にあります。
+
+- [消さなかった画面](_Storage/HTML/Data/01KY00V732PG7E4GY92RCS2Y21.html)
+- [痛まない声](_Storage/HTML/Data/01KY002GGH6FPAV6E04RM7CQV1.html)
+- [オークの下の金](_Storage/HTML/Data/01KXZY0KFKZ0C857W4FWTE6HVN.html)
+- [三分間の朝](_Storage/HTML/Data/01KXZD35VEVYH9E2Y8P626XDQZ.html)
+- [届かなかった赤いリボン](_Storage/HTML/Data/01KXYKT263HVC7BTEGB6GE0DXV.html)
+- [停電の投票所](_Storage/HTML/Data/01KXXTEHTN8BD98DS7WRQXV302.html)
+
+対応する Markdown 本文は [_Storage/Story](_Storage/Story)、挿絵 PNG は [_Storage/Illust](_Storage/Illust)、生成途中の素材やプロットは [_Storage/Material](_Storage/Material) と [_Storage/Plot](_Storage/Plot) にあります。
+
 ## プロンプトの種類
 
 `PromptResource.cs` には、主に 5 種類のプロンプトがあります。
