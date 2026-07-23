@@ -183,6 +183,8 @@ Storage
 
 一覧ページは [_Storage/HTML/index.html](_Storage/HTML/index.html) です。ブラウザで開くと、生成された短編小説の一覧を確認できます。
 
+GitHub のページ上でリンクを開いた場合、HTML として表示されず、ソースコードとして表示されます。実際の表示を確認する場合は、このリポジトリをチェックアウトしてから、ローカル環境で `_Storage/HTML/index.html` をブラウザで開いてください。
+
 個別のストーリー成果物は `_Storage/HTML/Data` 配下にあります。
 
 - [消さなかった画面](_Storage/HTML/Data/01KY00V732PG7E4GY92RCS2Y21.html)
